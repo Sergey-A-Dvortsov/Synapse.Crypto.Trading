@@ -11,7 +11,7 @@ namespace Synapse.Crypto.Trading
     {
 
         /// <summary>
-        /// The trade direction
+        /// Invert the trade direction
         /// </summary>
         /// <param name="side">direction</param>
         /// <returns></returns>

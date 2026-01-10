@@ -17,4 +17,22 @@ namespace Synapse.Crypto.Trading
         Sell
     }
 
+    /// <summary>
+    /// The position direction
+    /// </summary>
+    public enum PositionSides
+    {
+        LONG,
+        SHORT
+    }
+
+    /// <summary>
+    /// The position state
+    /// </summary>
+    public enum PositionStates
+    {
+        Open,
+        Close
+    }
+
 }

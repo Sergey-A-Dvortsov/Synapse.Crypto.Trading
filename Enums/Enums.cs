@@ -8,6 +8,16 @@ namespace Synapse.Crypto.Trading
 {
     // Copyright(c) [2026], [Sergey Dvortsov]
 
+
+    /// <summary>
+    /// The orderbook parts
+    /// </summary>
+    public enum BookSides
+    {
+        Ask,
+        Bid
+    }
+
     /// <summary>
     /// The trade direction
     /// </summary>
@@ -34,5 +44,7 @@ namespace Synapse.Crypto.Trading
         Open,
         Close
     }
+
+
 
 }

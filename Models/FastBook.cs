@@ -52,18 +52,18 @@ namespace Synapse.Crypto.Trading
 
         public Quote BestBid { get => Bids[BestBidIndex]; }
 
-        internal int BestAskIndex { get; set; }
+        public int BestAskIndex { get; set; }
 
-        internal int BestBidIndex { get; set; }
+        public int BestBidIndex { get; set; }
 
         public abstract DateTime UpdateTime { get; }
 
         public TimeSpan Delay { get; set; }
 
-        internal double ZeroAskPrice;
-        internal double ZeroBidPrice;
+        public double ZeroAskPrice;
+        public double ZeroBidPrice;
 
-        internal int Depth;
+        public int Depth;
 
         public bool UpdateWithSnapshot(Dictionary<BookSides, double[]> prices)
         {

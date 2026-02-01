@@ -129,5 +129,50 @@ namespace Synapse.Crypto.Trading
             return index;
         }
 
+        /// <summary>
+        /// Возвращает взвешенную по объему цену для заданного объема amount (USD) и стороны книги side.
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <param name="side"></param>
+        /// <returns></returns>
+        public double GetWAPrice(double amount, BookSides side)
+        {
+            double sum = 0;
+            double multisum = 0;
+
+            if (side == BookSides.Ask)
+            {
+                for (int i = 0; i < Asks.Length; i++)
+                {
+                    sum += Asks[i].Price * Asks[i].Size;
+                    sum += Asks[i].Size;
+                    if (sum >= amount)
+                    {
+                        double rest = amount - multisum;
+                        double waprice = (multisum + Asks[i].Price * rest) / amount;
+                        return waprice;
+                    }
+                }
+            }
+            else 
+            {
+                for (int i = 0; i < Bids.Length; i++)
+                {
+                    sum += Bids[i].Price * Bids[i].Size;
+                    sum += Bids[i].Size;
+                    if (sum >= amount)
+                    {
+                        double rest = amount - multisum;
+                        double waprice = (multisum + Asks[i].Price * rest) / amount;
+                        return waprice;
+                    }
+                }
+            }
+
+            return double.NaN;
+
+        }
+
+
     }
 }

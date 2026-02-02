@@ -152,7 +152,8 @@ namespace Synapse.Crypto.Trading
                     {
                         double rest = amount - multisum;
                         double restsum = rest / Asks[i].Price;
-                        return (multisum + Asks[i].Price * rest) / (sum + restsum);
+
+                        return (multisum + rest) / (sum + restsum);
                     }
                 }
             }
@@ -166,7 +167,7 @@ namespace Synapse.Crypto.Trading
                     {
                         double rest = amount - multisum;
                         double restsum = rest / Bids[i].Price;
-                        return (multisum + Bids[i].Price * rest) / (sum + restsum);
+                        return (multisum + rest) / (sum + restsum);
                     }
                 }
             }

@@ -144,13 +144,15 @@ namespace Synapse.Crypto.Trading
             {
                 for (int i = 0; i < Asks.Length; i++)
                 {
-                    sum += Asks[i].Price * Asks[i].Size;
+
+                    multisum += Asks[i].Price * Asks[i].Size;
                     sum += Asks[i].Size;
-                    if (sum >= amount)
+
+                    if (multisum >= amount)
                     {
                         double rest = amount - multisum;
-                        double waprice = (multisum + Asks[i].Price * rest) / amount;
-                        return waprice;
+                        double restsum = rest / Asks[i].Price;
+                        return (multisum + Asks[i].Price * rest) / (sum + restsum);
                     }
                 }
             }
@@ -158,13 +160,13 @@ namespace Synapse.Crypto.Trading
             {
                 for (int i = 0; i < Bids.Length; i++)
                 {
-                    sum += Bids[i].Price * Bids[i].Size;
+                    multisum += Bids[i].Price * Bids[i].Size;
                     sum += Bids[i].Size;
-                    if (sum >= amount)
+                    if (multisum >= amount)
                     {
                         double rest = amount - multisum;
-                        double waprice = (multisum + Asks[i].Price * rest) / amount;
-                        return waprice;
+                        double restsum = rest / Bids[i].Price;
+                        return (multisum + Bids[i].Price * rest) / (sum + restsum);
                     }
                 }
             }

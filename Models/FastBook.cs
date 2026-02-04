@@ -26,21 +26,25 @@ namespace Synapse.Crypto.Trading
     /// synchronization if accessing instances from multiple threads.</remarks>
     public abstract class FastBook
     {
-        private readonly double ticksize;
-        private readonly int decimals;
+        
+        
         private readonly double offset; // смещение от границ котировок книги заявок в %;
 
         public FastBook(string symbol, double ticksize, double offset = 0.01)
         {
             Symbol = symbol;
-            this.ticksize = ticksize;
-            this.decimals = ticksize.GetDecimals();
+            TickSize = ticksize;
+            //this.decimals = ticksize.GetDecimals();
             this.offset = offset;
         }
 
         public Logger logger = LogManager.GetCurrentClassLogger();
 
         public string Symbol { get; private set; }
+
+        public double TickSize { get; set; }
+
+        public int Decimals { get => TickSize.GetDecimals(); }
 
         public bool Valid { get; set; }
 
@@ -72,13 +76,13 @@ namespace Synapse.Crypto.Trading
 
             ZeroAskPrice = GetOffsetPrice(prcs[0], -1); // цена первой котировки будущего массива Asks
             double lastAsk = GetOffsetPrice(prcs[1], 1); // цена последней котировки будущего массива Asks
-            int askdepth = (int)((lastAsk - ZeroAskPrice) / ticksize);
+            int askdepth = (int)((lastAsk - ZeroAskPrice) / TickSize);
 
             prcs = prices[BookSides.Bid];
             ZeroBidPrice = GetOffsetPrice(prcs[0], 1); // цена первой котировки будущего массива Bids
             double lastBid = GetOffsetPrice(prcs[1], -1); // цена последней котировки будущего массива Bids
 
-            int biddepth = (int)((ZeroBidPrice - lastBid) / ticksize);
+            int biddepth = (int)((ZeroBidPrice - lastBid) / TickSize);
 
             Depth = Math.Max(askdepth, biddepth); // размер будущих массивов
 
@@ -87,8 +91,8 @@ namespace Synapse.Crypto.Trading
 
             for (int i = 0; i < Depth; i++)
             {
-                double askprice = Math.Round(ZeroAskPrice + ticksize * i, decimals);
-                double bidprice = Math.Round(ZeroBidPrice - ticksize * i, decimals);
+                double askprice = Math.Round(ZeroAskPrice + TickSize * i, Decimals);
+                double bidprice = Math.Round(ZeroBidPrice - TickSize * i, Decimals);
 
                 if (askprice == prices[BookSides.Ask][0])
                     BestAskIndex = i;
@@ -112,7 +116,7 @@ namespace Synapse.Crypto.Trading
         /// <returns></returns>
         private double GetOffsetPrice(double price, int k)
         {
-            return Math.Round((price + k * (price * offset)).PriceRound(ticksize), decimals);
+            return Math.Round((price + k * (price * offset)).PriceRound(TickSize), Decimals);
         }
 
         /// <summary>
@@ -124,8 +128,8 @@ namespace Synapse.Crypto.Trading
         public int GetIndex(double price, BookSides side)
         {
             int index = side == BookSides.Ask ?
-                (int)Math.Round(((price - ZeroAskPrice) / ticksize), 0) :
-                (int)Math.Round(((ZeroBidPrice - price) / ticksize), 0);
+                (int)Math.Round(((price - ZeroAskPrice) / TickSize), 0) :
+                (int)Math.Round(((ZeroBidPrice - price) / TickSize), 0);
             return index;
         }
 

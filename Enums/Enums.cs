@@ -45,6 +45,16 @@ namespace Synapse.Crypto.Trading
         Close
     }
 
+    /// <summary>
+    /// Instrument type
+    /// </summary>
+    public enum InstrumentTypes
+    {
+        Spot,
+        Linear,
+        Inverse,
+        Calendar
+    }
 
 
 }

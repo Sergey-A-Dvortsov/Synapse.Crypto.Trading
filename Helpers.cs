@@ -10,6 +10,11 @@ namespace Synapse.Crypto.Trading
     public static class Helpers
     {
 
+        public static string[] QuoteSymbols()
+        {
+            return ["USD", "USDT", "USDC", "USDE", "BTC"];
+        }
+
         /// <summary>
         /// Invert the trade direction
         /// </summary>
@@ -123,6 +128,24 @@ namespace Synapse.Crypto.Trading
             return ulong.Parse(strid);
 
         }
+
+        /// <summary>
+        /// Extracts the quote currency from the instrument name
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public static string GetQuoteSymbol(this string symbol)
+        {
+            foreach (var quote in QuoteSymbols())
+            {
+                if (symbol.EndsWith(quote)) return quote;
+            }
+
+            return string.Empty;
+
+        }
+        
+
 
     }
 }

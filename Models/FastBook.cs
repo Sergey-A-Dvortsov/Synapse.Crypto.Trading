@@ -30,17 +30,37 @@ namespace Synapse.Crypto.Trading
         
         private readonly double offset; // смещение от границ котировок книги заявок в %;
 
-        public FastBook(string symbol, double ticksize, double offset = 0.01)
+        public FastBook(InstrumentTypes type, string symbol, double ticksize, double offset = 0.01)
         {
+            Type = type;
             Symbol = symbol;
+
+            //BTCUSDT-27FEB26
+            if (type != InstrumentTypes.Calendar)
+            {
+                QuoteSymbol = symbol.GetQuoteSymbol();
+                BaseSymbol = symbol.Replace(QuoteSymbol, "").Replace("/", "");
+            }
+            else if (Symbol.Contains('-')) 
+            {
+                var temp = Symbol.Split("-")[0];
+                QuoteSymbol = temp.GetQuoteSymbol();
+                BaseSymbol = temp.Replace(QuoteSymbol, "").Replace("/", "");
+            }
+
             TickSize = ticksize;
-            //this.decimals = ticksize.GetDecimals();
             this.offset = offset;
         }
 
         public Logger logger = LogManager.GetCurrentClassLogger();
 
         public string Symbol { get; private set; }
+
+        public string BaseSymbol { get; private set; }
+        public string QuoteSymbol { get; private set; }
+
+
+        public InstrumentTypes Type { get; private set; }
 
         public double TickSize { get; set; }
 

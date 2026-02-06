@@ -51,9 +51,10 @@ namespace Synapse.Crypto.Trading
     public enum InstrumentTypes
     {
         Spot,
-        Linear,
-        Inverse,
-        Calendar
+        LinearPerpetual,
+        LinearFuture,
+        InversePerpetual,
+        InverseFuture
     }
 
 

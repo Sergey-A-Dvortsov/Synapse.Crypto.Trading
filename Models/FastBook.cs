@@ -35,19 +35,6 @@ namespace Synapse.Crypto.Trading
             Type = type;
             Symbol = symbol;
 
-            //BTCUSDT-27FEB26
-            if (type != InstrumentTypes.Calendar)
-            {
-                QuoteSymbol = symbol.GetQuoteSymbol();
-                BaseSymbol = symbol.Replace(QuoteSymbol, "").Replace("/", "");
-            }
-            else if (Symbol.Contains('-')) 
-            {
-                var temp = Symbol.Split("-")[0];
-                QuoteSymbol = temp.GetQuoteSymbol();
-                BaseSymbol = temp.Replace(QuoteSymbol, "").Replace("/", "");
-            }
-
             TickSize = ticksize;
             this.offset = offset;
         }
@@ -56,8 +43,8 @@ namespace Synapse.Crypto.Trading
 
         public string Symbol { get; private set; }
 
-        public string BaseSymbol { get; private set; }
-        public string QuoteSymbol { get; private set; }
+        public string BaseSymbol { get; set; }
+        public string QuoteSymbol { get; set; }
 
 
         public InstrumentTypes Type { get; private set; }
@@ -147,6 +134,8 @@ namespace Synapse.Crypto.Trading
         /// <returns></returns>
         public int GetIndex(double price, BookSides side)
         {
+            if (ZeroAskPrice == 0 || ZeroBidPrice == 0) return -1; 
+
             int index = side == BookSides.Ask ?
                 (int)Math.Round(((price - ZeroAskPrice) / TickSize), 0) :
                 (int)Math.Round(((ZeroBidPrice - price) / TickSize), 0);

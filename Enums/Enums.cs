@@ -52,9 +52,9 @@ namespace Synapse.Crypto.Trading
     {
         Spot,
         LinearPerpetual,
-        LinearFuture,
+        LinearFutures,
         InversePerpetual,
-        InverseFuture
+        InverseFutures
     }
 
 

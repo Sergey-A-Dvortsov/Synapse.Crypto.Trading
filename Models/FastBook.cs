@@ -46,7 +46,6 @@ namespace Synapse.Crypto.Trading
         public string BaseSymbol { get; set; }
         public string QuoteSymbol { get; set; }
 
-
         public InstrumentTypes Type { get; private set; }
 
         public double TickSize { get; set; }
@@ -68,6 +67,10 @@ namespace Synapse.Crypto.Trading
         public int BestBidIndex { get; set; }
 
         public abstract DateTime UpdateTime { get; }
+
+        public DateTime SnapshotTime { get; private set; }
+
+        public bool SnapshotReceived { get; private set; }
 
         public TimeSpan Delay { get; set; }
 
@@ -111,6 +114,9 @@ namespace Synapse.Crypto.Trading
                 Bids[i] = new Quote(bidprice, 0);
             }
 
+            SnapshotReceived = true;
+            SnapshotTime = DateTime.UtcNow;
+
             return true;
 
         }
@@ -123,6 +129,7 @@ namespace Synapse.Crypto.Trading
         /// <returns></returns>
         private double GetOffsetPrice(double price, int k)
         {
+            var decm = Decimals;
             return Math.Round((price + k * (price * offset)).PriceRound(TickSize), Decimals);
         }
 

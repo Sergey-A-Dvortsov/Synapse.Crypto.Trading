@@ -9,13 +9,18 @@ namespace Synapse.Crypto.Trading
     public abstract class OrderBook
     {
 
-        public OrderBook(InstrumentTypes type, string symbol, double ticksize)
+        public OrderBook(InstrumentTypes type, string symbol, double ticksize, int decimals)
         {
             Type = type;
             Symbol = symbol;
             TickSize = ticksize;
+            Decimals = decimals;
             Asks = [];
             Bids = new (Comparer<double>.Create( static (a, b) => b.CompareTo(a)));
+        }
+
+        public OrderBook(InstrumentTypes type, string symbol) : this(type, symbol, double.NaN, -1)
+        {
         }
 
         public Logger logger = LogManager.GetCurrentClassLogger();
@@ -29,7 +34,7 @@ namespace Synapse.Crypto.Trading
 
         public double TickSize { get; set; }
 
-        public int Decimals { get => TickSize.GetDecimals(); }
+        public int Decimals { get; set; }
 
         public bool Valid { get; set; }
 
@@ -57,9 +62,9 @@ namespace Synapse.Crypto.Trading
 
         //public abstract DateTime UpdateTime { get; }
 
-        public DateTime SnapshotTime { get; private set; }
+        public DateTime SnapshotTime { get; set; }
 
-        public bool SnapshotReceived { get; private set; }
+        public bool SnapshotReceived { get; set; }
 
         public TimeSpan Delay { get; set; }
 
@@ -80,10 +85,8 @@ namespace Synapse.Crypto.Trading
         {
             double sum = 0;
             double multisum = 0;
-            var quotes = side == BookSides.Ask ? Asks : Bids;  
+            var quotes = side == BookSides.Ask ? Asks.ToArray() : Bids.ToArray();  
 
-            if (side == BookSides.Ask)
-            {
                foreach (var kvp in quotes)
                 {
                     multisum += kvp.Key * kvp.Value;
@@ -93,10 +96,9 @@ namespace Synapse.Crypto.Trading
                     {
                         double rest = amount - multisum;
                         double restsum = rest / kvp.Key;
-                        return (multisum + rest) / (sum + restsum);
+                        return Math.Round((multisum + rest) / (sum + restsum), Decimals);
                     }
                 }
-            }
 
             return double.NaN;
 

@@ -9,6 +9,8 @@ namespace Synapse.Crypto.Trading
     public abstract class OrderBook
     {
 
+        private readonly object _lock = new();
+
         public OrderBook(InstrumentTypes type, string symbol, double ticksize, int decimals)
         {
             Type = type;
@@ -16,7 +18,7 @@ namespace Synapse.Crypto.Trading
             TickSize = ticksize;
             Decimals = decimals;
             Asks = [];
-            Bids = new (Comparer<double>.Create( static (a, b) => b.CompareTo(a)));
+            Bids = new(Comparer<double>.Create(static (a, b) => b.CompareTo(a)));
         }
 
         public OrderBook(InstrumentTypes type, string symbol) : this(type, symbol, double.NaN, -1)
@@ -42,21 +44,29 @@ namespace Synapse.Crypto.Trading
 
         public SortedDictionary<double, double> Bids { get; private set; }
 
-        public Quote BestAsk
+        public Quote? BestAsk
         {
             get
             {
-                var kvp = Asks.FirstOrDefault();
-                return new Quote(kvp.Key, kvp.Value );
+                lock (_lock)
+                {
+                    if(Asks.Count == 0) return null;
+                    var ask = Asks.First();
+                    return new Quote(ask.Key, ask.Value);
+                }
             }
         }
 
-        public Quote BestBid
+        public Quote? BestBid
         {
             get
             {
-                var kvp = Bids.FirstOrDefault();
-                return new Quote(kvp.Key, kvp.Value);
+                lock (_lock)
+                {
+                    if (Bids.Count == 0) return null;
+                    var bid = Bids.First();
+                    return new Quote(bid.Key, bid.Value);
+                }
             }
         }
 
@@ -70,10 +80,10 @@ namespace Synapse.Crypto.Trading
 
         public int Depth;
 
-        public bool UpdateWithSnapshot(Dictionary<BookSides, double[]> prices)
-        {
-            return true;
-        }
+        //public bool UpdateWithSnapshot(Dictionary<BookSides, double[]> prices)
+        //{
+        //    return true;
+        //}
 
         /// <summary>
         /// Возвращает взвешенную по объему цену для заданного объема amount (USD) и стороны книги side.
@@ -83,27 +93,46 @@ namespace Synapse.Crypto.Trading
         /// <returns></returns>
         public double GetWAPrice(double amount, BookSides side)
         {
+
             double sum = 0;
             double multisum = 0;
-            var quotes = side == BookSides.Ask ? Asks.ToArray() : Bids.ToArray();  
+            KeyValuePair<double, double>[]? quotes = null;
 
-               foreach (var kvp in quotes)
+            if (side == BookSides.Ask)
+            {
+                if (Asks.Count == 0) return double.NaN;
+                lock (_lock)
                 {
-                    multisum += kvp.Key * kvp.Value;
-                    sum += kvp.Value;
-
-                    if (multisum >= amount)
-                    {
-                        double rest = amount - multisum;
-                        double restsum = rest / kvp.Key;
-                        return Math.Round((multisum + rest) / (sum + restsum), Decimals);
-                    }
+                    quotes = [.. Asks];
                 }
+            }
+            else if (side == BookSides.Bid)
+            {
+                if (Bids.Count == 0) return double.NaN;
+                lock (_lock)
+                {
+                    quotes = [.. Bids];
+                }
+            }
+
+            if (quotes == null) return double.NaN;
+
+            foreach (var kvp in quotes)
+            {
+                multisum += kvp.Key * kvp.Value;
+                sum += kvp.Value;
+
+                if (multisum >= amount)
+                {
+                    double rest = amount - multisum;
+                    double restsum = rest / kvp.Key;
+                    return Math.Round((multisum + rest) / (sum + restsum), Decimals);
+                }
+            }
 
             return double.NaN;
 
         }
-
 
     }
 }

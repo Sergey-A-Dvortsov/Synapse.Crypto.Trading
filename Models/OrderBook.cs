@@ -11,6 +11,8 @@ namespace Synapse.Crypto.Trading
 
         private readonly object _lock = new();
 
+        private TimeSpan spanSum = TimeSpan.Zero; 
+
         public OrderBook(InstrumentTypes type, string symbol, double ticksize, int decimals)
         {
             Type = type;
@@ -23,6 +25,27 @@ namespace Synapse.Crypto.Trading
 
         public OrderBook(InstrumentTypes type, string symbol) : this(type, symbol, double.NaN, -1)
         {
+        }
+
+        /// <summary>
+        /// Число событий
+        /// </summary>
+        public long EventCount { set; get; }
+
+        private DateTime _lastTime;
+        public DateTime LastTime 
+        { 
+            get => _lastTime;
+            set 
+            {
+                spanSum += LastTime != DateTime.MinValue ? value - LastTime : spanSum;
+                _lastTime = value;
+            } 
+        }
+
+        public TimeSpan AvgEventInterval
+        {
+            get => EventCount != 0 ? spanSum / EventCount : TimeSpan.Zero; 
         }
 
         public Logger logger = LogManager.GetCurrentClassLogger();
@@ -44,31 +67,45 @@ namespace Synapse.Crypto.Trading
 
         public SortedDictionary<double, double> Bids { get; private set; }
 
-        public Quote? BestAsk
-        {
-            get
-            {
-                lock (_lock)
-                {
-                    if(Asks.Count == 0) return null;
-                    var ask = Asks.First();
-                    return new Quote(ask.Key, ask.Value);
-                }
-            }
-        }
+        //public Quote? BestAsk
+        //{
+        //    get
+        //    {
+        //        lock (_lock)
+        //        {
+        //            if(Asks.Count == 0) return null;
 
-        public Quote? BestBid
-        {
-            get
-            {
-                lock (_lock)
-                {
-                    if (Bids.Count == 0) return null;
-                    var bid = Bids.First();
-                    return new Quote(bid.Key, bid.Value);
-                }
-            }
-        }
+        //            try
+        //            {
+
+        //            }
+        //            catch (Exception ex)
+        //            {
+
+        //                throw;
+        //            }
+        //            var ask = Asks.First();
+        //            return new Quote(ask.Key, ask.Value);
+        //        }
+        //    }
+        //}
+
+        public Quote? BestAsk { set; get; }
+
+        public Quote? BestBid { set; get; }
+
+        //public Quote? BestBid
+        //{
+        //    get
+        //    {
+        //        lock (_lock)
+        //        {
+        //            if (Bids.Count == 0) return null;
+        //            var bid = Bids.First();
+        //            return new Quote(bid.Key, bid.Value);
+        //        }
+        //    }
+        //}
 
         //public abstract DateTime UpdateTime { get; }
 

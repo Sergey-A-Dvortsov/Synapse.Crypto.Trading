@@ -2,6 +2,7 @@
 using Synapse.General;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 namespace Synapse.Crypto.Trading
@@ -66,46 +67,11 @@ namespace Synapse.Crypto.Trading
         public SortedDictionary<double, double> Asks { get; private set; }
 
         public SortedDictionary<double, double> Bids { get; private set; }
-
-        //public Quote? BestAsk
-        //{
-        //    get
-        //    {
-        //        lock (_lock)
-        //        {
-        //            if(Asks.Count == 0) return null;
-
-        //            try
-        //            {
-
-        //            }
-        //            catch (Exception ex)
-        //            {
-
-        //                throw;
-        //            }
-        //            var ask = Asks.First();
-        //            return new Quote(ask.Key, ask.Value);
-        //        }
-        //    }
-        //}
-
+        
         public Quote? BestAsk { set; get; }
 
         public Quote? BestBid { set; get; }
 
-        //public Quote? BestBid
-        //{
-        //    get
-        //    {
-        //        lock (_lock)
-        //        {
-        //            if (Bids.Count == 0) return null;
-        //            var bid = Bids.First();
-        //            return new Quote(bid.Key, bid.Value);
-        //        }
-        //    }
-        //}
 
         //public abstract DateTime UpdateTime { get; }
 
@@ -117,10 +83,8 @@ namespace Synapse.Crypto.Trading
 
         public int Depth;
 
-        //public bool UpdateWithSnapshot(Dictionary<BookSides, double[]> prices)
-        //{
-        //    return true;
-        //}
+        //public abstract bool Update<T>(T update);
+
 
         /// <summary>
         /// Возвращает взвешенную по объему цену для заданного объема amount (USD) и стороны книги side.

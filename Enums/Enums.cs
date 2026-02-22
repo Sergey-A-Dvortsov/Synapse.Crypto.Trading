@@ -57,5 +57,12 @@ namespace Synapse.Crypto.Trading
         InverseFutures
     }
 
+    public enum MarketDataTypes
+    {
+        Orderbook,
+        Trade,
+        Ticker,
+        Candle
+    }
 
 }

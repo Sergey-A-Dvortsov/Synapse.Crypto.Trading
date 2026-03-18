@@ -65,4 +65,12 @@ namespace Synapse.Crypto.Trading
         Candle
     }
 
+    public enum Exchanges
+    {
+        Bybit,
+        Bitfinex,
+        Binance,
+        Okx
+    }
+
 }
